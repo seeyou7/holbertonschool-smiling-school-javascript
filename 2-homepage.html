@@ -319,7 +319,7 @@
                               width="15px"
                             />
                           </div>
-                          <span class="main-color">8 min</span>
+                          <span class="main-color">8 min</span> 
                         </div>
                       </div>
                     </div>
@@ -1089,5 +1089,72 @@
         </div>
       </section>
     </main>
+    <script>
+      $(document).ready(function () {
+        const apiUrl = "https://smileschool-api.hbtn.info/popular-tutorials";
+
+        // Show loader before AJAX request
+        $(".loader").show();
+
+        // Fetch video tutorials dynamically from the API
+        $.ajax({
+          url: apiUrl,
+          method: "GET",
+          success: function (data) {
+            // Hide loader once the data is fetched
+            $(".loader").hide();
+
+            const videoContainer = $("#video-container");
+            videoContainer.empty(); // Clear any existing content
+
+            // Loop through the data and add each video card to the carousel
+            data.forEach((video, index) => {
+              const activeClass = index === 0 ? "active" : "";
+
+              const videoCard = `
+                <div class="carousel-item ${activeClass}">
+                  <div class="card">
+                    <img src="${video.thumb_url}" class="card-img-top" alt="${video.title}">
+                    <div class="card-body">
+                      <h5 class="card-title font-weight-bold">${video.title}</h5>
+                      <p class="card-text text-muted">${video["sub-title"]}</p>
+                      <div class="creator d-flex align-items-center">
+                        <img src="${video.author_pic_url}" alt="${video.author}" width="30" class="rounded-circle">
+                        <h6 class="pl-3 m-0 main-color">${video.author}</h6>
+                      </div>
+                      <div class="info pt-3 d-flex justify-content-between">
+                        <div class="rating">${generateStars(video.star)}</div>
+                        <span class="main-color">${video.duration}</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              `;
+              videoContainer.append(videoCard); // Append each video card
+            });
+
+            // Initialize carousel
+            $("#videoCarousel").carousel();
+          },
+          error: function (error) {
+            // Hide loader and show an error message
+            $(".loader").hide();
+            console.error("Error fetching popular tutorials:", error);
+            $("#video-container").html('<p>Failed to load video tutorials. Please try again later.</p>');
+          },
+        });
+
+        // Helper function to generate star ratings dynamically
+        function generateStars(rating) {
+          let stars = "";
+          for (let i = 0; i < 5; i++) {
+            stars += i < rating
+              ? '<img src="images/star_on.png" alt="star" width="15">'
+              : '<img src="images/star_off.png" alt="star" width="15">';
+          }
+          return stars;
+        }
+      });
+    </script>
   </body>
 </html>

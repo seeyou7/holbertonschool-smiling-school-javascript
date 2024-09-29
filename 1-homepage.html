@@ -41,6 +41,28 @@
       integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh"
       crossorigin="anonymous"
     />
+
+    <!-- Loader CSS - New CSS Added -->
+    <style>
+      .loader {
+        border: 10px solid #f3f3f3;
+        border-top: 10px solid #C271FF;
+        border-radius: 50%;
+        width: 80px;
+        height: 80px;
+        animation: spin 2s linear infinite;
+        margin: 20px auto;
+      }
+
+      @keyframes spin {
+        0% {
+          transform: rotate(0deg);
+        }
+        100% {
+          transform: rotate(360deg);
+        }
+      }
+    </style>
   </head>
   <body class="body">
     <header class="header">
@@ -136,80 +158,20 @@
       </div>
     </header>
     <main class="main">
+      <!-- Quotes Section Starts -->
       <section class="quotes section d-flex align-items-center">
         <div class="container">
+          <!-- Loader Added Here -->
+          <div class="loader"></div>
+
+          <!-- Carousel for dynamic quotes -->
           <div
             id="carouselExampleControls"
             class="carousel slide"
             data-ride="carousel"
           >
             <div class="carousel-inner">
-              <div class="carousel-item active">
-                <div class="row mx-auto align-items-center">
-                  <div class="col-12 col-sm-2 col-lg-2 offset-lg-1 text-center">
-                    <img
-                      src="images/profile_5.jpg"
-                      class="d-block align-self-center"
-                      alt="Carousel Pic 1"
-                    />
-                  </div>
-                  <div class="col-12 col-sm-7 offset-sm-2 col-lg-9 offset-lg-0">
-                    <div class="quote-text">
-                      <p class="text-white">
-                        « Those tutorials are concise and go straight to the
-                        point. I can’t think of a better place to learn smiling.
-                        And it’s so fun!
-                      </p>
-                      <h4 class="text-white font-weight-bold">Person Name</h4>
-                      <span class="text-white">weather presenter</span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              <div class="carousel-item">
-                <div class="row mx-auto align-items-center">
-                  <div class="col-12 col-sm-2 col-lg-2 offset-lg-1 text-center">
-                    <img
-                      src="images/profile_5.jpg"
-                      class="d-block align-self-center"
-                      alt="Carousel Pic 1"
-                    />
-                  </div>
-                  <div class="col-12 col-sm-7 offset-sm-2 col-lg-9 offset-lg-0">
-                    <div class="quote-text">
-                      <p class="text-white">
-                        « Those tutorials are concise and go straight to the
-                        point. I can’t think of a better place to learn smiling.
-                        And it’s so fun!
-                      </p>
-                      <h4 class="text-white font-weight-bold">Person Name</h4>
-                      <span class="text-white">weather presenter</span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              <div class="carousel-item">
-                <div class="row mx-auto align-items-center">
-                  <div class="col-12 col-sm-2 col-lg-2 offset-lg-1 text-center">
-                    <img
-                      src="images/profile_5.jpg"
-                      class="d-block align-self-center"
-                      alt="Carousel Pic 1"
-                    />
-                  </div>
-                  <div class="col-12 col-sm-7 offset-sm-2 col-lg-9 offset-lg-0">
-                    <div class="quote-text">
-                      <p class="text-white">
-                        « Those tutorials are concise and go straight to the
-                        point. I can’t think of a better place to learn smiling.
-                        And it’s so fun!
-                      </p>
-                      <h4 class="text-white font-weight-bold">Person Name</h4>
-                      <span class="text-white">weather presenter</span>
-                    </div>
-                  </div>
-                </div>
-              </div>
+              <!-- Quotes will be dynamically injected here by JavaScript -->
             </div>
             <a
               class="carousel-control-prev arrow-left"
@@ -240,6 +202,63 @@
           </div>
         </div>
       </section>
+      <!-- Quotes Section Ends -->
     </main>
-  </body>
-</html>
+
+    <script>
+      $(document).ready(function() {
+        const quotesUrl = "https://smileschool-api.hbtn.info/quotes";
+    
+        // Show loader before AJAX request
+        $(".loader").show();
+    
+        // Fetch quotes dynamically from the API
+        $.ajax({
+          url: quotesUrl,
+          method: "GET",
+          success: function(data) {
+            // Hide loader once the data is fetched
+            $(".loader").hide();
+    
+            const quotesContainer = $(".carousel-inner");
+            quotesContainer.empty(); // Clear any existing content
+    
+            // Loop through the data and add each quote as a carousel item
+            data.forEach((quote, index) => {
+              const activeClass = index === 0 ? "active" : "";
+    
+              // Assign specific images for quotes
+              const imagePath = index % 2 === 0 ? 'images/profile_5.jpg' : 'images/profile_2.jpg'; // Alternate between the two images
+    
+              const quoteItem = `
+                <div class="carousel-item ${activeClass}">
+                  <div class="row mx-auto align-items-center">
+                    <div class="col-12 col-sm-2 col-lg-2 offset-lg-1 text-center">
+                      <img src="${imagePath}" class="d-block align-self-center" alt="${quote.name}" />
+                    </div>
+                    <div class="col-12 col-sm-7 offset-sm-2 col-lg-9 offset-lg-0">
+                      <div class="quote-text">
+                        <p class="text-white">« ${quote.text} »</p>
+                        <h4 class="text-white font-weight-bold">${quote.name}</h4>
+                        <span class="text-white">${quote.title}</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              `;
+              quotesContainer.append(quoteItem);
+            });
+    
+            // Initialize the carousel if it's not already initialized
+            $("#carouselExampleControls").carousel();
+          },
+          error: function (error) {
+            // Hide loader and show an error message
+            $(".loader").hide();
+            console.error("Error fetching quotes:", error);
+            $(".carousel-inner").html('<p>Failed to load testimonials. Please try again later.</p>');
+          },
+        });
+      });
+    </script>
+    
